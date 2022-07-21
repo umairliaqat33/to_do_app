@@ -1,13 +1,14 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/model/task.dart';
 
-class DatabaseHelper {
-  DatabaseHelper._privateConstructor();
+class DatabaseHelper extends ChangeNotifier {
+  // DatabaseHelper._privateConstructor();
 
-  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+  static final DatabaseHelper instance = DatabaseHelper();
   static Database? _database;
 
   Future<Database> get database async => _database ??= await _initDatabase();
@@ -37,31 +38,31 @@ class DatabaseHelper {
     Database db = await instance.database;
     var task = await db.query('Task', orderBy: 'name');
     List<Task> taskList =
-    task.isNotEmpty ? task.map((e) => Task.fromMap(e)).toList() : [];
+        task.isNotEmpty ? task.map((e) => Task.fromMap(e)).toList() : [];
+    notifyListeners();
     return taskList;
   }
 
   Future<int> add(Task task) async {
     Database db = await instance.database;
+    notifyListeners();
     return await db.insert('Task', task.toMap());
   }
 
-
   Future<int> remove(String name) async {
     Database db = await instance.database;
+    notifyListeners();
     return await db.delete('Task', where: 'name=?', whereArgs: [name]);
   }
 
-  Future<int> change(int id,int done) async {
+  Future<int> change(Task task, int id) async {
     Database db = await instance.database;
-    return await db.rawUpdate(
-        'UPDATE Task SET done = ? WHERE id = ?', [done, id]);
+    notifyListeners();
+    return await db.update(
+      'Task',
+      task.toMap(),
+      where: 'id=?',
+      whereArgs: [id],
+    );
   }
-
-  // Future<int> change(Task task,int id) async {
-  //   Database db = await instance.database;
-  //   return await db.update('Task',task.toMap(), where: 'id=?',whereArgs: [id]);
-  // }
-
-
 }
