@@ -7,8 +7,8 @@ import 'model/task.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(ChangeNotifierProvider(create: (_) =>DatabaseHelper(),
-  child: MyApp()));
+  runApp(
+      ChangeNotifierProvider(create: (_) => DatabaseHelper(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ),
       body: Consumer<DatabaseHelper>(
-        builder: (context, databaseHelper,child)=>Column(
+        builder: (context, databaseHelper, child) => Column(
           children: [
             Container(
               decoration: BoxDecoration(
@@ -58,7 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 color: Colors.amberAccent,
               ),
               width: w,
-              padding: EdgeInsets.only(top: 60, left: 30, right: 30, bottom: 30),
+              padding:
+                  EdgeInsets.only(top: 60, left: 30, right: 30, bottom: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,8 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   CircleAvatar(
                       backgroundColor: Colors.white,
                       radius: 30,
-                      child:
-                          Icon(Icons.list, color: Colors.amberAccent, size: 30)),
+                      child: Icon(Icons.list,
+                          color: Colors.amberAccent, size: 30)),
                   SizedBox(height: 10),
                   SizedBox(width: 10),
                   Text('To-Do',
@@ -116,7 +117,19 @@ class _MyHomePageState extends State<MyHomePage> {
                                           _task!,
                                           _task!.id!.toInt(),
                                         );
-                                        setState(() {});
+                                        if (_task!.done == 1) {
+                                          setState(() {
+                                            bool_done = true;
+                                          });
+                                        } else if (_task!.done == 0) {
+                                          setState(() {
+                                            bool_done = false;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            bool_done = true;
+                                          });
+                                        }
                                         print(_task!.done);
                                       },
                                       value: _task!.done! == 1 ? false : true,
@@ -124,12 +137,13 @@ class _MyHomePageState extends State<MyHomePage> {
                                     title: Text(
                                       _task!.name, //here
                                       style: TextStyle(
-                                          decoration: _task!.done != null
+                                          decoration: bool_done
                                               ? TextDecoration.lineThrough
                                               : null),
                                     ),
                                     onLongPress: () {
-                                      DatabaseHelper.instance.remove(_task!.name);
+                                      DatabaseHelper.instance
+                                          .remove(_task!.name);
                                     }),
                               );
                             }).toList(),

@@ -59,7 +59,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   child: Text('Add', style: TextStyle(color: Colors.white)),
                   style: ButtonStyle(
                     backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.amberAccent),
+                        MaterialStateProperty.all<Color>(Colors.amberAccent),
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {

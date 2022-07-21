@@ -1,5 +1,5 @@
 class Task {
-  int? done; //we will be using 0 and 1 except booleans
+  int? done;
   String name;
   int? id;
 

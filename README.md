@@ -1,16 +1,8 @@
 # to_do_app
 
-A new Flutter project.
+A new Flutter project. Which can help you to take care of your task that you want to make sure have
+been done or not.
 
-## Getting Started
+In this app you can add,delete,mark as done as well.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+We have used sqflite's local server to store list of task in it.

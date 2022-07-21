@@ -32,8 +32,6 @@ class DatabaseHelper extends ChangeNotifier {
     )''');
   }
 
-  // id INTEGER Primary KEY,
-
   Future<List<Task>> getTasks() async {
     Database db = await instance.database;
     var task = await db.query('Task', orderBy: 'name');
