@@ -137,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     title: Text(
                                       _task!.name, //here
                                       style: TextStyle(
-                                          decoration: bool_done
+                                          decoration: _task!.done == 0
                                               ? TextDecoration.lineThrough
                                               : null),
                                     ),

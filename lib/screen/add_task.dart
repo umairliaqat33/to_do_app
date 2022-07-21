@@ -49,6 +49,7 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     }
                     return null;
                   },
+                  autofocus: true,
                   cursorColor: Colors.black,
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.text,
