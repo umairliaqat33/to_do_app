@@ -1,5 +1,6 @@
 import 'dart:math';
-
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/database/database.dart';
 import 'package:to_do_app/model/task.dart';
@@ -22,6 +23,24 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   }
 
   Random random = new Random();
+  DateTime selectedDate = DateTime.now();
+
+  DateTime DatePicker() {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2020),
+            lastDate: DateTime(2030))
+        .then((pickedDate) {
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        selectedDate = pickedDate;
+      });
+    });
+    return selectedDate;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +75,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                   textAlign: TextAlign.center,
                   controller: taskController,
                 ),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          selectedDate = DatePicker();
+                        });
+                        FocusScope.of(context).unfocus();
+                      },
+                      child: Text(
+                        "Chose Date",
+                        style: TextStyle(
+                          color: Colors.amberAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "Picked Date: ${(DateFormat.yMd().format(selectedDate))}",
+                      ),
+                    ),
+                  ],
+                ),
                 TextButton(
                   child: Text('Add', style: TextStyle(color: Colors.white)),
                   style: ButtonStyle(
@@ -66,9 +109,12 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     if (_formKey.currentState!.validate()) {
                       await DatabaseHelper.instance.add(
                         Task(
-                            name: taskController.text,
-                            done: 1,
-                            id: random.nextInt(200)),
+                          name: taskController.text,
+                          done: 1,
+                          id: random.nextInt(200),
+                          date:
+                              "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}",
+                        ),
                       );
                       print(taskController.text);
                       Navigator.pop(context);

@@ -111,6 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           name: task.name,
                                           id: task.id,
                                           done: done! ? 0 : 1,
+                                          date: task.date,
                                         );
                                         if (_task == null) return;
                                         await DatabaseHelper.instance.change(
@@ -134,16 +135,28 @@ class _MyHomePageState extends State<MyHomePage> {
                                       },
                                       value: _task!.done! == 1 ? false : true,
                                     ),
-                                    title: Text(
-                                      _task!.name, //here
-                                      style: TextStyle(
-                                          decoration: _task!.done == 0
-                                              ? TextDecoration.lineThrough
-                                              : null),
+                                    title: Column(
+                                      // mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _task!.name, //here
+                                          style: TextStyle(
+                                              decoration: _task!.done == 0
+                                                  ? TextDecoration.lineThrough
+                                                  : null),
+                                        ),
+                                        Text(
+                                          _task!.date, //here
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     onLongPress: () {
-                                      DatabaseHelper.instance
-                                          .remove(_task!.name);
+                                      DatabaseHelper.instance.remove(task.name);
                                     }),
                               );
                             }).toList(),

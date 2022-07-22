@@ -15,7 +15,7 @@ class DatabaseHelper extends ChangeNotifier {
 
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'task1.db');
+    String path = join(documentsDirectory.path, 'task2.db');
     return await openDatabase(
       path,
       version: 1,
@@ -28,7 +28,8 @@ class DatabaseHelper extends ChangeNotifier {
     CREATE TABLE Task(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
-    done INTEGER
+    done INTEGER,
+    date TEXT
     )''');
   }
 
