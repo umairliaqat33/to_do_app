@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/database/database.dart';
 import 'package:to_do_app/model/task.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AddTaskScreen extends StatefulWidget {
   @override
@@ -110,17 +111,23 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       await DatabaseHelper.instance.add(
                         Task(
                           name: taskController.text,
-                          done: 1,
+                          done: 0,
                           id: random.nextInt(200),
                           date:
                               "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}",
                         ),
                       );
-                      print(taskController.text);
+                      Fluttertoast.showToast(
+                          msg: "Task have been added",
+                          backgroundColor: Colors.amberAccent,
+                          textColor: Colors.white,
+                          fontSize: 16.0
+                      );
                       Navigator.pop(context);
                       setState(() {
                         taskController.clear();
                       });
+
                     }
                   },
                 )

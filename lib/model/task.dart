@@ -1,10 +1,10 @@
 class Task {
-  int? done;
+  int done;
   String name;
   int? id;
   String date;
 
-  Task({required this.name, this.done, this.id, required this.date});
+  Task({required this.name,required this.done, this.id, required this.date});
 
   Map<String, dynamic> toMap() {
     return {

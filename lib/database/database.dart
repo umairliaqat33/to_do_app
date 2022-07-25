@@ -33,11 +33,20 @@ class DatabaseHelper extends ChangeNotifier {
     )''');
   }
 
-  Future<List<Task>> getTasks() async {
+  Future<List<Task>> getDoneTasks(int id) async {
     Database db = await instance.database;
-    var task = await db.query('Task', orderBy: 'name');
+    var task = await db.query('Task', orderBy: 'name',where: 'done=?',whereArgs: [id]);
     List<Task> taskList =
         task.isNotEmpty ? task.map((e) => Task.fromMap(e)).toList() : [];
+    notifyListeners();
+    return taskList;
+  }
+
+  Future<List<Task>> getNotDoneTasks(int id) async {
+    Database db = await instance.database;
+    var task = await db.query('Task', orderBy: 'name',where: 'done=?',whereArgs: [id]);
+    List<Task> taskList =
+    task.isNotEmpty ? task.map((e) => Task.fromMap(e)).toList() : [];
     notifyListeners();
     return taskList;
   }
@@ -62,6 +71,16 @@ class DatabaseHelper extends ChangeNotifier {
       task.toMap(),
       where: 'id=?',
       whereArgs: [id],
+    );
+  }
+  Future<int> update(Task task) async {
+    Database db = await instance.database;
+    notifyListeners();
+    return await db.update(
+      'Task',
+      task.toMap(),
+      where: 'id=?',
+      whereArgs: [task.id],
     );
   }
 }
