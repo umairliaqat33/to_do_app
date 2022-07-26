@@ -6,8 +6,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:to_do_app/model/task.dart';
 
 class DatabaseHelper extends ChangeNotifier {
-  // DatabaseHelper._privateConstructor();
-
   static final DatabaseHelper instance = DatabaseHelper();
   static Database? _database;
 
@@ -15,7 +13,7 @@ class DatabaseHelper extends ChangeNotifier {
 
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, 'task2.db');
+    String path = join(documentsDirectory.path, 'task3.db');
     return await openDatabase(
       path,
       version: 1,
@@ -29,13 +27,15 @@ class DatabaseHelper extends ChangeNotifier {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT,
     done INTEGER,
-    date TEXT
+    date TEXT,
+    time TEXT
     )''');
   }
 
   Future<List<Task>> getDoneTasks(int id) async {
     Database db = await instance.database;
-    var task = await db.query('Task', orderBy: 'name',where: 'done=?',whereArgs: [id]);
+    var task = await db
+        .query('Task', orderBy: 'name', where: 'done=?', whereArgs: [id]);
     List<Task> taskList =
         task.isNotEmpty ? task.map((e) => Task.fromMap(e)).toList() : [];
     notifyListeners();
@@ -44,9 +44,10 @@ class DatabaseHelper extends ChangeNotifier {
 
   Future<List<Task>> getNotDoneTasks(int id) async {
     Database db = await instance.database;
-    var task = await db.query('Task', orderBy: 'name',where: 'done=?',whereArgs: [id]);
+    var task = await db
+        .query('Task', orderBy: 'name', where: 'done=?', whereArgs: [id]);
     List<Task> taskList =
-    task.isNotEmpty ? task.map((e) => Task.fromMap(e)).toList() : [];
+        task.isNotEmpty ? task.map((e) => Task.fromMap(e)).toList() : [];
     notifyListeners();
     return taskList;
   }
@@ -73,14 +74,15 @@ class DatabaseHelper extends ChangeNotifier {
       whereArgs: [id],
     );
   }
-  Future<int> update(Task task) async {
+
+  Future<int> update(Task task, int? id) async {
     Database db = await instance.database;
     notifyListeners();
     return await db.update(
       'Task',
       task.toMap(),
       where: 'id=?',
-      whereArgs: [task.id],
+      whereArgs: [id],
     );
   }
 }

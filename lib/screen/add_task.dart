@@ -43,6 +43,8 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
     return selectedDate;
   }
 
+  TimeOfDay time = TimeOfDay.now();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -100,6 +102,33 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     ),
                   ],
                 ),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: () async {
+                        TimeOfDay? newTime = await showTimePicker(
+                            context: context, initialTime: time);
+                        if (newTime == null) return;
+                        setState(() {
+                          time = newTime;
+                        });
+                        FocusScope.of(context).unfocus();
+                      },
+                      child: Text(
+                        "Chose Time",
+                        style: TextStyle(
+                          color: Colors.amberAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        "Picked Time: ${time.format(context)}",
+                      ),
+                    ),
+                  ],
+                ),
                 TextButton(
                   child: Text('Add', style: TextStyle(color: Colors.white)),
                   style: ButtonStyle(
@@ -111,23 +140,22 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                       await DatabaseHelper.instance.add(
                         Task(
                           name: taskController.text,
-                          done: 0,
+                          done: 1,
                           id: random.nextInt(200),
                           date:
                               "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}",
+                          time: time.format(context),
                         ),
                       );
                       Fluttertoast.showToast(
-                          msg: "Task have been added",
+                          msg: "Task added",
                           backgroundColor: Colors.amberAccent,
                           textColor: Colors.white,
-                          fontSize: 16.0
-                      );
+                          fontSize: 16.0);
                       Navigator.pop(context);
                       setState(() {
                         taskController.clear();
                       });
-
                     }
                   },
                 )

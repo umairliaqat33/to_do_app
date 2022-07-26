@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:to_do_app/screen/add_task.dart';
+import 'constants/constants.dart';
 import 'database/database.dart';
 import 'model/task.dart';
+import 'package:to_do_app/constants/banner.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,78 +39,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Task? _task;
   bool isSelected = false;
-
-  creatingAlertDialog(BuildContext context, String name) {
-    return showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(25)),
-            ),
-            title: Text('Delete Task'),
-            content: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: TextStyle(fontSize: 20, color: Colors.black),
-                  children: <TextSpan>[
-                    TextSpan(
-                        text: name,
-                        style: TextStyle(
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        )),
-                    TextSpan(
-                        text: "\nAre you sure you want to delete task?",
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey,
-                        )),
-                    TextSpan(
-                        text: "\n*Once deleted will never be restored*",
-                        style: TextStyle(fontSize: 10, color: Colors.red))
-                  ],
-                )),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  DatabaseHelper.instance.remove(name);
-                  Navigator.of(context).pop();
-                  Fluttertoast.showToast(
-                      msg: "Task have been deleted",
-                      backgroundColor: Colors.amberAccent,
-                      textColor: Colors.white,
-                      fontSize: 16.0);
-                },
-                child: Text(
-                  "Delete",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  "Cancel",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-            ],
-          );
-        });
-  }
+  final _prefs = SharedPreferences.getInstance();
 
   late final GlobalKey<FormState> _formKey;
+
   @override
   void initState() {
     super.initState();
+    getSwitchState();
     setState(() {
       _formKey = new GlobalKey<FormState>();
     });
   }
-
 
   creatingUpdateAlertDialog(BuildContext context, Task task) {
     final taskController = TextEditingController(text: task.name);
@@ -115,10 +58,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     DateTime DatePicker() {
       showDatePicker(
-          context: context,
-          initialDate: selectedDate,
-          firstDate: DateTime(2020),
-          lastDate: DateTime(2030))
+              context: context,
+              initialDate: selectedDate,
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2030))
           .then((pickedDate) {
         if (pickedDate == null) {
           return;
@@ -130,6 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
       });
       return selectedDate;
     }
+
     return showDialog(
         context: context,
         builder: (context) {
@@ -138,16 +82,16 @@ class _MyHomePageState extends State<MyHomePage> {
               borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
             title: Text('Update Task'),
-            content: Form(
-              key: _formKey,
-              child: Container(
-                height: 200,
+            content: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      Text('Update Task',
+                      Text('Update ' "\'${task.name}\'",
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 30, color: Colors.amberAccent)),
+                          style: TextStyle(
+                              fontSize: 30, color: Colors.amberAccent)),
                       TextFormField(
                         validator: (value) {
                           if (value!.isEmpty) {
@@ -187,34 +131,61 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ],
                       ),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              TimeOfDay? newTime = await showTimePicker(
+                                  context: context, initialTime: time);
+                              if (newTime == null) return;
+                              setState(() {
+                                time = newTime;
+                              });
+                              FocusScope.of(context).unfocus();
+                            },
+                            child: Text(
+                              "Chose Time",
+                              style: TextStyle(
+                                color: Colors.amberAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              "Picked Time: ${time.format(context)}",
+                            ),
+                          ),
+                        ],
+                      ),
                       TextButton(
-                        child: Text('Update', style: TextStyle(color: Colors.white)),
+                        child: Text('Update',
+                            style: TextStyle(color: Colors.white)),
                         style: ButtonStyle(
-                          backgroundColor:
-                          MaterialStateProperty.all<Color>(Colors.amberAccent),
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.amberAccent),
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             await DatabaseHelper.instance.update(
-                              Task(
-                                name: taskController.text,
-                                done: task.done,
-                                id: task.id,
-                                date:
-                                "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}",
-                              ),
-                            );
+                                Task(
+                                  name: taskController.text,
+                                  done: task.done,
+                                  id: task.id,
+                                  date:
+                                      "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}",
+                                  time: time.format(context),
+                                ),
+                                task.id);
                             Fluttertoast.showToast(
-                                msg: "Task have been added",
+                                msg: "Task Updated",
                                 backgroundColor: Colors.amberAccent,
                                 textColor: Colors.white,
-                                fontSize: 16.0
-                            );
+                                fontSize: 16.0);
                             Navigator.pop(context);
                             setState(() {
                               taskController.clear();
                             });
-
                           }
                         },
                       )
@@ -222,21 +193,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             actions: [
-              TextButton(
-                onPressed: () {
-                  // DatabaseHelper.instance.remove(name);
-                  Navigator.of(context).pop();
-                  Fluttertoast.showToast(
-                      msg: "Task Updated",
-                      backgroundColor: Colors.amberAccent,
-                      textColor: Colors.white,
-                      fontSize: 16.0);
-                },
-                child: Text(
-                  "Update",
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -251,9 +207,22 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
+  TimeOfDay time = TimeOfDay.now();
+
+  saveSwitchState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("switchState", isSelected);
+  }
+
+  getSwitchState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isSelected = prefs.getBool("switchState")!;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    double w = MediaQuery.of(context).size.width;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -266,43 +235,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Consumer<DatabaseHelper>(
         builder: (context, databaseHelper, child) => Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey,
-                    offset: Offset(0.0, 2),
-                    blurRadius: 6,
-                  )
-                ],
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(15),
-                    bottomRight: Radius.circular(15)),
-                color: Colors.amberAccent,
-              ),
-              width: w,
-              padding:
-                  EdgeInsets.only(top: 60, left: 30, right: 30, bottom: 30),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  CircleAvatar(
-                      backgroundColor: Colors.white,
-                      radius: 30,
-                      child: Icon(Icons.list,
-                          color: Colors.amberAccent, size: 30)),
-                  SizedBox(height: 10, width: 10),
-                  Text('To-Do',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 50,
-                          fontWeight: FontWeight.w700)),
-                  // Text('${DatabaseHelper.instance} Tasks',
-                  //     style: TextStyle(color: Colors.white, fontSize: 18))
-                ],
-              ),
-            ),
+            MainBanner(),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -320,6 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     onChanged: (bool value) {
                       setState(() {
                         isSelected = value;
+                        saveSwitchState();
                       });
                     }),
               ],
@@ -357,6 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               id: task.id,
                                               done: task.done == 1 ? 0 : 1,
                                               date: task.date,
+                                              time: task.time,
                                             );
                                             if (_task == null) return;
                                             await DatabaseHelper.instance
@@ -373,11 +308,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 bool_done = false;
                                               });
                                             }
-                                            // else {
-                                            //   setState(() {
-                                            //     bool_done = true;
-                                            //   });
-                                            // }
                                             print(_task!.done);
                                           },
                                           value:
@@ -396,7 +326,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                       Icons.delete_forever)),
                                               IconButton(
                                                   onPressed: () {
-                                                    creatingUpdateAlertDialog(context, task);
+                                                    creatingUpdateAlertDialog(
+                                                        context, task);
                                                   },
                                                   icon: Icon(Icons.edit))
                                             ],
@@ -415,11 +346,26 @@ class _MyHomePageState extends State<MyHomePage> {
                                                           .lineThrough
                                                       : null),
                                             ),
-                                            Text(
-                                              _task!.date, //here
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                              ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  _task!.date, //here
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Text(
+                                                  _task!.time, //here
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -467,7 +413,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                         Icons.delete_forever)),
                                                 IconButton(
                                                     onPressed: () {
-                                                      creatingUpdateAlertDialog(context, task);
+                                                      creatingUpdateAlertDialog(
+                                                          context, task);
                                                     },
                                                     icon: Icon(Icons.edit))
                                               ],
@@ -481,6 +428,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 id: task.id,
                                                 done: task.done == 1 ? 0 : 1,
                                                 date: task.date,
+                                                time: task.time,
                                               );
                                               if (_task == null) return;
                                               await DatabaseHelper.instance
@@ -497,11 +445,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   bool_done = false;
                                                 });
                                               }
-                                              // else {
-                                              //   setState(() {
-                                              //     bool_done = true;
-                                              //   });
-                                              // }
                                               print(_task!.done);
                                             },
                                             value:
@@ -515,16 +458,32 @@ class _MyHomePageState extends State<MyHomePage> {
                                               Text(
                                                 _task!.name, //here
                                                 style: TextStyle(
+                                                    fontSize: 18,
                                                     decoration: _task!.done == 0
                                                         ? TextDecoration
                                                             .lineThrough
                                                         : null),
                                               ),
-                                              Text(
-                                                _task!.date, //here
-                                                style: TextStyle(
-                                                  color: Colors.grey,
-                                                ),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    _task!.date, //here
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Text(
+                                                    _task!.time, //here
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
@@ -541,7 +500,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   )
           ],
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
