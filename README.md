@@ -28,23 +28,12 @@ Application will have a list of task both separately done and not done.
 
 Application will be able to toggle between done and not done tasks.
 
-In this app you can add
-![](images/add_task_screen.png)
 
 
-,delete ![](images/delete_task.png)
+Watch a video to understand flow of app.
 
+[![Watch the video](https://img.youtube.com/vi/nTQUwghvy5Q/default.jpg)](https://www.youtube.com/watch?v=Wb2rm5iWizg)
 
-
-,mark as done ![](images/done_tasks.png)
-
-
-
- and mark as not done as well ![](images/not_done_tasks.png)
- 
- You can also pick time and date both as well ![](images/time_picker.png) ![](images/date_picker.png)
-
-User also have to ability to update his tasks in means of date,time,name,etc. ![](images/edit_task.png)
 
 
 
