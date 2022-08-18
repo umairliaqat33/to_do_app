@@ -32,7 +32,7 @@ Application will be able to toggle between done and not done tasks.
 
 Watch a video to understand flow of app.
 
-[![Watch the video](app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png)](https://www.youtube.com/watch?v=Wb2rm5iWizg)
+[![Watch the video](images/ic_launcher_foreground.png)](https://www.youtube.com/watch?v=Wb2rm5iWizg)
 
 
 
